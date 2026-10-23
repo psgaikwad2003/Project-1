@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudops-nexus-svc
+  namespace: cloudops
+  labels:
+    app.kubernetes.io/name: cloudops-nexus
+    app.kubernetes.io/part-of: cloudops-nexus
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: cloudops-nexus
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP
