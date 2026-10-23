@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cloudops-project
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: cloudops-nexus
+spec:
+  description: ArgoCD Project for CloudOps-Nexus Enterprise Deployments
+  sourceRepos:
+    - "https://github.com/psgaikwad2003/Project-1.git"
+  destinations:
+    - namespace: cloudops
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  roles:
+    - name: read-only
+      description: Read-only privileges for developers
+      policies:
+        - p, proj:cloudops-project:read-only, applications, get, cloudops-project/*, allow
