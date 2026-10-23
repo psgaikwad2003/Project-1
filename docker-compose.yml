@@ -1,0 +1,105 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: psgaikwad2003/cloudops-nexus:latest
+    container_name: cloudops-nexus-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=cloudops-nexus
+      - APP_ENV=local
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql://cloudops:cloudops_pass@postgres:5432/cloudops_db
+      - REDIS_URL=redis://redis:6379/0
+      - METRICS_ENABLED=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cloudops-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudops-nexus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cloudops
+      POSTGRES_PASSWORD: cloudops_pass
+      POSTGRES_DB: cloudops_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cloudops-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloudops -d cloudops_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cloudops-nexus-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cloudops-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: cloudops-nexus-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - cloudops-net
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: cloudops-nexus-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - cloudops-net
+    depends_on:
+      - prometheus
+
+networks:
+  cloudops-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
