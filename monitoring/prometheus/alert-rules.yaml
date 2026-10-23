@@ -1,0 +1,47 @@
+groups:
+  - name: cloudops_nexus_alerts
+    rules:
+      - alert: ServiceUnavailable
+        expr: up{job="cloudops-nexus-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          tier: platform
+        annotations:
+          summary: "CloudOps Nexus API instance is down"
+          description: "Instance {{ $labels.instance }} has been unreachable for more than 1 minute."
+
+      - alert: HighHttpErrorRate5xx
+        expr: >-
+          sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m])) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          tier: application
+        annotations:
+          summary: "High HTTP 5xx error rate detected (>5%)"
+          description: "HTTP 5xx error rate is currently {{ $value | printf \"%.2f\" }}% over a 5m window."
+
+      - alert: HighRequestLatencyP99
+        expr: >-
+          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1.5
+        for: 3m
+        labels:
+          severity: warning
+          tier: application
+        annotations:
+          summary: "High P99 latency breach (>1.5s)"
+          description: "99th percentile of request latency exceeds 1.5s for more than 3 minutes."
+
+      - alert: HighMemorySaturation
+        expr: >-
+          (container_memory_working_set_bytes{container="cloudops-nexus-api"} / container_spec_memory_limit_bytes{container="cloudops-nexus-api"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "Pod memory saturation exceeds 85%"
+          description: "Pod {{ $labels.pod }} is consuming {{ $value | printf \"%.2f\" }}% of its allocated memory limit."
