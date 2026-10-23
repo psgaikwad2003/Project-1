@@ -1,0 +1,13 @@
+# Example configuration values for AWS Production deployment
+aws_region          = "us-east-1"
+environment         = "production"
+cluster_name        = "cloudops-nexus-prod"
+cluster_version     = "1.30"
+vpc_cidr            = "10.0.0.0/16"
+availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# Worker node sizing
+eks_node_instance_types = ["t3.large"]
+eks_min_capacity        = 3
+eks_max_capacity        = 10
+eks_desired_capacity    = 3
