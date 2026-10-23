@@ -1,0 +1,44 @@
+name: Terraform Infrastructure CI
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+
+jobs:
+  terraform-validate:
+    name: Terraform Lint & Security Validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Verify Terraform Formatting
+        run: |
+          terraform fmt -check -recursive
+
+      - name: Initialize Terraform Working Directory
+        run: |
+          terraform init -backend=false
+
+      - name: Validate Terraform Configuration Files
+        run: |
+          terraform validate
+
+      - name: Scan Infrastructure as Code Security with tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: terraform
+          soft_fail: true
