@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cloudops-nexus-netpol
+  namespace: cloudops
+  labels:
+    app.kubernetes.io/name: cloudops-nexus
+    app.kubernetes.io/part-of: cloudops-nexus
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cloudops-nexus
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # Allow Ingress from Ingress controller and Prometheus scraper
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8000
+
+  # Allow Egress to DNS, Postgres, and Redis within cluster
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
