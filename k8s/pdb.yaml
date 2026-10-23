@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cloudops-nexus-pdb
+  namespace: cloudops
+  labels:
+    app.kubernetes.io/name: cloudops-nexus
+    app.kubernetes.io/part-of: cloudops-nexus
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudops-nexus
