@@ -1,0 +1,18 @@
+apiVersion: v2
+name: cloudops-nexus
+description: Production-grade Helm chart for CloudOps-Nexus Enterprise Microservices Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - microservice
+  - devops
+  - fastapi
+  - kubernetes
+  - cloud-native
+maintainers:
+  - name: psgaikwad2003
+    email: psgaikwad2003@gmail.com
+home: https://github.com/psgaikwad2003/Project-1
+sources:
+  - https://github.com/psgaikwad2003/Project-1
