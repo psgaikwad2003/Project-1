@@ -40,4 +40,4 @@ If you discover a security vulnerability, please do **NOT** open a public issue.
 
 Instead, please send an encrypted email or security advisory to:
 - **Security Contact**: psgaikwad2003@gmail.com
-- **Response SLA**: Initial acknowledgement within 24 hours; remediation plan within 72 hours.
+- **Response SLA**: Initial acknowledgement within 24 hours; remediation plan within 72 hrs.
