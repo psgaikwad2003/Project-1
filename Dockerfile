@@ -1,7 +1,7 @@
 # ========================================================
 # Stage 1: Build stage for dependency resolution
 # ========================================================
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.15-slim-bookworm AS builder
 
 WORKDIR /build
 
@@ -21,7 +21,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements
 # ========================================================
 # Stage 2: Minimal non-root production runtime
 # ========================================================
-FROM python:3.12-slim-bookworm AS runtime
+FROM python:3.15-slim-bookworm AS runtime
 
 WORKDIR /app
 
